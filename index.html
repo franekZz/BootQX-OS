@@ -22,30 +22,29 @@
         .config-step { background: rgba(20, 0, 40, 0.95); border: 2px solid var(--p-color); padding: 40px; border-radius: 20px; text-align: center; width: 350px; display: none; }
         .config-step.active { display: block; }
         
-        input, select { margin: 15px 0; padding: 12px; width: 100%; border-radius: 8px; border: 1px solid var(--p-color); background: #000; color: #fff; outline: none; }
+        input, select { margin: 15px 0; padding: 12px; width: 100%; border-radius: 8px; border: 1px solid var(--p-color); background: #000; color: #fff; outline: none; box-sizing: border-box; }
         .btn-next { cursor: pointer; background: var(--p-color); color: white; border: none; padding: 10px 20px; font-weight: bold; border-radius: 8px; width: 100%; transition: 0.3s; margin-top: 10px; }
 
         /* PULPIT */
         #desktop { display: none; width: 100vw; height: 100vh; position: relative; }
         .desktop-icons { display: flex; flex-direction: column; gap: 20px; padding: 20px; }
-        .desktop-icon { cursor: pointer; text-align: center; color: white; font-size: 12px; width: 70px; }
+        .desktop-icon { cursor: pointer; text-align: center; color: white; font-size: 12px; width: 70px; display: none; }
         .icon-box { width: 50px; height: 50px; background: #1a0033; border: 2px solid var(--p-color); border-radius: 10px; margin: 0 auto 5px; display: flex; align-items: center; justify-content: center; font-size: 20px; color: var(--p-color); }
 
         /* OKNA */
         .window { width: 500px; height: 380px; background: #fff; color: #000; border-radius: 10px; position: absolute; display: none; flex-direction: column; box-shadow: 0 10px 40px rgba(0,0,0,0.5); z-index: 100; overflow: hidden; border: 1px solid #444; }
         .window-header { background: #1a1a1a; color: #fff; padding: 10px; cursor: move; display: flex; justify-content: space-between; user-select: none; }
-        .close-btn { cursor: pointer; color: #ff5555; }
+        .close-btn { cursor: pointer; color: #ff5555; font-weight: bold; }
 
         /* TASKBAR */
         .taskbar { position: absolute; bottom: 0; width: 100%; height: 45px; background: #000; display: flex; align-items: center; padding: 0 15px; box-sizing: border-box; }
         .qx-btn { font-weight: bold; color: var(--p-color); cursor: pointer; font-size: 20px; margin-right: 20px; }
-        #start-menu { position: absolute; bottom: 45px; left: 0; width: 200px; background: #1a1a1a; border: 1px solid var(--p-color); display: none; flex-direction: column; }
-        .start-item { padding: 12px; cursor: pointer; border-bottom: 1px solid #333; }
+        #clock { margin-left: auto; font-size: 14px; }
 
         /* TERMINAL */
         #term-content { background: #000; color: #0f0; flex: 1; padding: 10px; font-family: monospace; overflow-y: auto; }
         #cmd-in { background: transparent; border: none; color: #0f0; outline: none; width: 70%; font-family: monospace; }
-        textarea { flex: 1; border: none; padding: 10px; resize: none; outline: none; }
+        textarea { flex: 1; border: none; padding: 10px; resize: none; outline: none; font-size: 16px; }
 
         /* BIOS */
         #bios-ui { background: #0000aa; align-items: flex-start; justify-content: flex-start; padding: 40px; font-family: monospace; }
@@ -64,17 +63,17 @@
     <div id="config-screen">
         <div id="step1" class="config-step active">
             <h2>BootQX OS</h2>
-            <p>Imię / Name:</p>
-            <input type="text" id="uname" placeholder="...">
-            <button class="btn-next" onclick="nextStep(2)">Next</button>
+            <p>Imię / Name (Required):</p>
+            <input type="text" id="uname" placeholder="Enter name...">
+            <button class="btn-next" onclick="validateName()">Next</button>
         </div>
         <div id="step2" class="config-step">
             <h2>Hasło / Password</h2>
-            <input type="password" id="upass" placeholder="...">
+            <input type="password" id="upass" placeholder="Hasło (opcjonalne)...">
             <button class="btn-next" onclick="nextStep(3)">Next</button>
         </div>
         <div id="step3" class="config-step">
-            <h2>Language / 语言</h2>
+            <h2>Language</h2>
             <select id="ulang">
                 <option value="pl">Polski</option>
                 <option value="en">English</option>
@@ -109,9 +108,9 @@
 
     <div id="desktop">
         <div class="desktop-icons">
-            <div class="desktop-icon" onclick="openWin('cmd-win')"><div class="icon-box">>_</div>CMD</div>
-            <div class="desktop-icon" onclick="openWin('note-win')"><div class="icon-box">T</div><span id="label-note">Notatnik</span></div>
-            <div class="desktop-icon" onclick="openWin('browser-win')"><div class="icon-box">W</div>Browser</div>
+            <div class="desktop-icon" id="cmd-icon" style="display: block;" onclick="openWin('cmd-win')"><div class="icon-box">>_</div>CMD</div>
+            <div class="desktop-icon" id="note-icon" onclick="openWin('note-win')"><div class="icon-box">T</div><span id="label-note">Notatnik</span></div>
+            <div class="desktop-icon" id="browser-icon" onclick="openWin('browser-win')"><div class="icon-box">W</div>Browser</div>
         </div>
 
         <div id="cmd-win" class="window" style="left:40px; top:40px;">
@@ -124,40 +123,20 @@
             <textarea></textarea>
         </div>
 
-        <div id="settings-win" class="window" style="left:150px; top:100px; width: 450px;">
-            <div class="window-header"><span id="title-settings">Ustawienia</span><span onclick="closeWin('settings-win')" class="close-btn">×</span></div>
-            <div class="settings-nav">
-                <div class="nav-item active" id="nav-update" onclick="setTab('update-tab', this)">Update</div>
-                <div id="wifi-nav" class="nav-item" style="display:none;" onclick="setTab('wifi-tab', this)">WiFi</div>
-            </div>
-            <div id="update-tab" class="set-content active"><h3>Update</h3><button class="btn-next" onclick="startUpdate()" id="set-up-btn">Update</button></div>
-            <div id="wifi-tab" class="set-content">
-                <h3 id="wifi-h">WiFi</h3>
-                <div style="border: 1px solid #ddd; padding: 10px; margin-bottom: 5px;"><strong id="wifi-p-name">Potato Wifi</strong> <button class="btn-next" onclick="connectWifi('potato')" style="float:right; width:auto; margin:0;">Connect</button></div>
-                <div style="border: 1px solid #ddd; padding: 10px;"><strong id="wifi-g-name">Pro Gamer Wifi</strong> <button class="btn-next" onclick="connectWifi('gamer')" style="float:right; width:auto; margin:0;">Connect</button></div>
-            </div>
-        </div>
-
         <div id="browser-win" class="window" style="left:120px; top:120px; width: 600px;">
             <div class="window-header"><span>QXBrowser</span><span onclick="closeWin('browser-win')" class="close-btn">×</span></div>
-            <div id="browser-res" style="flex:1; background:#eee; display:flex; align-items:center; justify-content:center; flex-direction:column; color:#000;"><h2 id="b-net-name">Offline</h2></div>
+            <div style="flex:1; background:#eee; display:flex; align-items:center; justify-content:center; color:#000;"><h2>Połączono z siecią</h2></div>
         </div>
 
         <div class="taskbar">
-            <div class="qx-btn" onclick="toggleStart()">QX</div>
-            <div id="net-label" style="font-size:12px; color:red; margin-right:15px;">Offline</div>
-            <div id="clock" style="margin-left:auto"></div>
-        </div>
-        <div id="start-menu">
-            <div class="start-item" id="start-set" onclick="openWin('settings-win'); toggleStart()">⚙ Ustawienia</div>
-            <div class="start-item" onclick="location.reload()">🔄 Restart</div>
+            <div class="qx-btn">QX</div>
+            <div id="clock"></div>
         </div>
     </div>
 
     <script>
-        let sysData = { user: "", pass: "", net: false, lang: "pl", currentWifi: "" };
+        let sysData = { user: "", pass: "", lang: "pl" };
 
-        // NAPRAWIONE INTRO
         window.onload = () => {
             const t1 = document.getElementById('t1'), t2 = document.getElementById('t2'), t3 = document.getElementById('t3');
             setTimeout(() => t1.style.opacity = 1, 500);
@@ -168,15 +147,19 @@
             setTimeout(() => t3.style.opacity = 0, 6000);
             setTimeout(() => {
                 document.getElementById('intro-screen').style.display = 'none';
-                document.getElementById('config-screen').style.display = 'flex'; // To dodano!
+                document.getElementById('config-screen').style.display = 'flex';
             }, 6500);
         };
 
-        const langData = {
-            pl: { load: "Wczytywanie...", greet: "Witaj, ", bootS: "Uruchom System", note: "Notatnik", set: "Ustawienia", help: "wifi on/off, notatnik.exe, cls, help" },
-            en: { load: "Loading...", greet: "Welcome, ", bootS: "Start System", note: "Notepad", set: "Settings", help: "wifi on/off, notatnik.exe, cls, help" },
-            zh: { load: "正在加载...", greet: "你好, ", bootS: "启动系统", note: "记事本", set: "设置", help: "命令: wifi on/off, notatnik.exe, cls, help" }
-        };
+        function validateName() {
+            let n = document.getElementById('uname').value.trim();
+            if(n === "") {
+                alert("Nazwa nie może być pusta! / Name cannot be empty!");
+            } else {
+                sysData.user = n;
+                nextStep(2);
+            }
+        }
 
         function nextStep(s) {
             document.querySelectorAll('.config-step').forEach(e => e.classList.remove('active'));
@@ -184,10 +167,8 @@
         }
 
         function finishSetup() {
-            sysData.user = document.getElementById('uname').value || "User";
             sysData.pass = document.getElementById('upass').value;
             sysData.lang = document.getElementById('ulang').value;
-            applyLang();
             document.getElementById('config-screen').style.display = 'none';
             document.getElementById('loading-screen').style.display = 'flex';
             let p = 0;
@@ -197,23 +178,10 @@
             }, 50);
         }
 
-        function applyLang() {
-            const l = langData[sysData.lang];
-            document.getElementById('load-label').innerText = l.load;
-            document.getElementById('boot-sys-btn').innerText = l.bootS;
-            document.getElementById('label-note').innerText = l.note;
-            document.getElementById('title-settings').innerText = l.set;
-            document.getElementById('start-set').innerText = "⚙ " + l.set;
-            if(sysData.lang === 'zh') {
-                document.getElementById('wifi-p-name').innerText = "土豆 WiFi";
-                document.getElementById('wifi-g-name').innerText = "专业玩家 WiFi";
-            }
-        }
-
         function showLogin() {
             document.getElementById('loading-screen').style.display = 'none';
             document.getElementById('login-screen').style.display = 'flex';
-            document.getElementById('login-greet').innerText = langData[sysData.lang].greet + sysData.user;
+            document.getElementById('login-greet').innerText = "Witaj, " + sysData.user;
             if(!sysData.pass) document.getElementById('pass-in').style.display = 'none';
         }
 
@@ -222,71 +190,41 @@
                 document.getElementById('login-screen').style.display = 'none';
                 document.getElementById('desktop').style.display = 'block';
                 setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString(); }, 1000);
-            } else alert("Error!");
+            } else alert("Błąd!");
         }
 
         function openWin(id) { document.getElementById(id).style.display = 'flex'; }
         function closeWin(id) { document.getElementById(id).style.display = 'none'; }
-        function toggleStart() {
-            let m = document.getElementById('start-menu');
-            m.style.display = (m.style.display === 'flex') ? 'none' : 'flex';
-        }
 
-        function setTab(tabId, el) {
-            document.querySelectorAll('.set-content').forEach(c => c.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            document.getElementById(tabId).classList.add('active'); el.classList.add('active');
-        }
-
-        function connectWifi(type) {
-            if(type === 'potato') { sysData.currentWifi = (sysData.lang === 'zh' ? "土豆 WiFi" : "Potato Wifi"); }
-            else { 
-                let p = prompt("Password (1234):"); 
-                if(p === "1234") sysData.currentWifi = (sysData.lang === 'zh' ? "专业玩家 WiFi" : "Pro Gamer Wifi"); 
-            }
-            updateWifiUI();
-        }
-
-        function updateWifiUI() {
-            if(sysData.net) {
-                document.getElementById('b-net-name').innerText = "Connected: " + sysData.currentWifi;
-                document.getElementById('net-label').innerText = "Online (" + sysData.currentWifi + ")";
-                document.getElementById('net-label').style.color = "lime";
-            }
-        }
-
-        function startUpdate() {
-            closeWin('settings-win');
-            document.getElementById('desktop').style.display = 'none';
-            document.getElementById('loading-screen').style.display = 'flex';
-            let p = 0;
-            let itv = setInterval(() => {
-                p += 2; document.getElementById('fill').style.width = p + "%";
-                if(p>=100) { clearInterval(itv); document.getElementById('loading-screen').style.display = 'none'; document.getElementById('boot-screen').style.display = 'flex'; }
-            }, 30);
-        }
-
-        function bootSystem() { document.getElementById('boot-screen').style.display = 'none'; document.getElementById('desktop').style.display = 'block'; }
-        function openBios() { document.getElementById('boot-screen').style.display = 'none'; document.getElementById('bios-ui').style.display = 'block'; }
-        
+        // CMD LOGIKA
         document.getElementById('cmd-in').onkeypress = function(e) {
             if(e.key === 'Enter') {
-                let v = this.value.toLowerCase().trim();
+                let v = this.value.trim().toLowerCase();
                 let h = document.getElementById('history');
                 h.innerHTML += `<div>C:\\Users\\${sysData.user}> ${this.value}</div>`;
-                if(['wifi on', 'internet on', 'tplink on'].includes(v)) {
-                    sysData.net = true; document.getElementById('wifi-nav').style.display = 'block';
-                    sysData.currentWifi = (sysData.lang === 'zh' ? "土豆 WiFi" : "Potato Wifi"); updateWifiUI();
-                } else if(['wifi off', 'internet off', 'tplink off'].includes(v)) {
-                    sysData.net = false; document.getElementById('wifi-nav').style.display = 'none';
-                    document.getElementById('net-label').innerText = "Offline"; document.getElementById('net-label').style.color = "red";
-                } else if(v === 'help') h.innerHTML += `<div>${langData[sysData.lang].help}</div>`;
+                
+                if(v === 'notatnik.exe add to pulpit') {
+                    document.getElementById('note-icon').style.display = 'block';
+                    h.innerHTML += `<div style="color:cyan">Skrót 'Notatnik' został dodany do pulpitu.</div>`;
+                } 
+                else if(v === 'notatnik.exe') {
+                    openWin('note-win');
+                }
+                else if(v === 'help') {
+                    h.innerHTML += `<div>Dostępne: notatnik.exe add to pulpit, notatnik.exe, cls, reset pc</div>`;
+                }
                 else if(v === 'cls') h.innerHTML = "";
-                else if(v === 'notatnik.exe') openWin('note-win');
-                this.value = ''; document.getElementById('term-content').scrollTop = 9999;
+                else if(v === 'reset pc') location.reload();
+                else {
+                    h.innerHTML += `<div style="color:red">Błędna komenda.</div>`;
+                }
+
+                this.value = '';
+                document.getElementById('term-content').scrollTop = 9999;
             }
         }
 
+        // DRAG OKIEN
         let act = null, ox, oy;
         document.querySelectorAll('.window-header').forEach(h => {
             h.onmousedown = (e) => { act = h.parentElement; ox = e.clientX-act.offsetLeft; oy = e.clientY-act.offsetTop; act.style.zIndex = 500; };
