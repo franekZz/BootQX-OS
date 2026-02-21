@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>BootQX OS v1.0</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div id="login-screen">
+        <div class="logo">
+            <pre>
+  ____              _    _______  __  ____  ____ 
+ | __ )  ___   ___ | |_ / _ \ \ \/ / / ___|/ ___|
+ |  _ \ / _ \ / _ \| __| | | \ \  /  \___ \\___ \
+ | |_) | (_) | (_) | |_| |_| / /  \   ___) |___) |
+ |____/ \___/ \___/ \__|\__\_\/_/\_\ |____/|____/ 
+            </pre>
+            <p>System stworzony przez Dejw_Devo1</p>
+        </div>
+
+        <div class="login-box">
+            <input type="password" id="password" placeholder="Wpisz hasło...">
+            <button onclick="login()">Zaloguj</button>
+            <p id="error-msg"></p>
+        </div>
+    </div>
+
+    <div id="desktop" style="display: none;">
+        <div class="taskbar">
+            <div class="start-btn">QX</div>
+            <div class="clock" id="clock"></div>
+        </div>
+        <div class="window">
+            <div class="window-header">Notatnik - Codel (Kodi)</div>
+            <textarea placeholder="Zacznij pisać..."></textarea>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
