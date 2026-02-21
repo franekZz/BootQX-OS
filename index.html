@@ -3,19 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BootQX OS - Multilingual</title>
+    <title>BootQX OS</title>
     <style>
         :root { --p-color: #bf00ff; --p-soft: #6a00b3; }
         body { margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; overflow: hidden; background: #0d001a; color: #fff; }
 
-        /* TŁO CHMURY */
+        /* INTRO */
+        #intro-screen { position: fixed; inset: 0; background: #000; display: flex; align-items: center; justify-content: center; z-index: 5000; font-size: 50px; font-weight: bold; }
+        .fade-text { opacity: 0; transition: 1.5s; position: absolute; }
+
+        /* TŁO */
         .clouds-bg { position: fixed; width: 100%; height: 100%; background: linear-gradient(to bottom, #1a0033, #0d001a); z-index: -1; }
         .cloud { position: absolute; background: rgba(191, 0, 255, 0.1); border-radius: 50%; filter: blur(50px); animation: drift 25s infinite linear; }
         @keyframes drift { from { transform: translateX(-200px); } to { transform: translateX(110vw); } }
-
-        /* EKRAN POWITALNY (INTRO) */
-        #intro-screen { position: fixed; inset: 0; background: #000; display: flex; align-items: center; justify-content: center; z-index: 5000; font-size: 48px; font-weight: bold; transition: 1s; }
-        .fade-text { opacity: 0; transition: 1s; position: absolute; }
 
         /* KONFIGURACJA */
         #config-screen, #loading-screen, #login-screen, #boot-screen, #bios-ui { position: fixed; inset: 0; display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 2000; }
@@ -41,7 +41,6 @@
         .qx-btn { font-weight: bold; color: var(--p-color); cursor: pointer; font-size: 20px; margin-right: 20px; }
         #start-menu { position: absolute; bottom: 45px; left: 0; width: 200px; background: #1a1a1a; border: 1px solid var(--p-color); display: none; flex-direction: column; }
         .start-item { padding: 12px; cursor: pointer; border-bottom: 1px solid #333; }
-        .start-item:hover { background: var(--p-color); }
 
         /* TERMINAL */
         #term-content { background: #000; color: #0f0; flex: 1; padding: 10px; font-family: monospace; overflow-y: auto; }
@@ -75,7 +74,7 @@
             <button class="btn-next" onclick="nextStep(3)">Next</button>
         </div>
         <div id="step3" class="config-step">
-            <h2>Język / Language / 语言</h2>
+            <h2>Language / 语言</h2>
             <select id="ulang">
                 <option value="pl">Polski</option>
                 <option value="en">English</option>
@@ -103,9 +102,9 @@
     </div>
 
     <div id="bios-ui">
-        <div style="background:#ccc; color:#000; width:100%; padding:2px 10px;">QXBios Setup - Dejw_Devo1 Edition</div>
-        <p>CPU: BootQX Virtual 4.2GHz | GPU: RTX 3060 | RAM: 16GB | MB: Gigabyte (DEL to BIOS)</p>
-        <p style="color:yellow; margin-top:20px;">ESC / DEL to Exit.</p>
+        <div style="background:#ccc; color:#000; width:100%; padding:2px 10px;">QXBios Setup - Gigabyte Motherboard</div>
+        <p>CPU: BootQX Virtual 4.2GHz | GPU: RTX 3060 | RAM: 16GB</p>
+        <p style="color:yellow; margin-top:20px;">Use ESC to Exit. DEL key detected.</p>
     </div>
 
     <div id="desktop">
@@ -117,10 +116,7 @@
 
         <div id="cmd-win" class="window" style="left:40px; top:40px;">
             <div class="window-header"><span id="title-cmd">Terminal</span><span onclick="closeWin('cmd-win')" class="close-btn">×</span></div>
-            <div id="term-content">
-                <div id="history">BootQX OS. Type 'help'.<br></div>
-                <span>C:\></span><input type="text" id="cmd-in" autocomplete="off">
-            </div>
+            <div id="term-content"><div id="history">Type 'help'.<br></div><span>C:\></span><input type="text" id="cmd-in" autocomplete="off"></div>
         </div>
 
         <div id="note-win" class="window" style="left:80px; top:80px;">
@@ -134,34 +130,17 @@
                 <div class="nav-item active" id="nav-update" onclick="setTab('update-tab', this)">Update</div>
                 <div id="wifi-nav" class="nav-item" style="display:none;" onclick="setTab('wifi-tab', this)">WiFi</div>
             </div>
-            <div id="update-tab" class="set-content active">
-                <h3 id="set-up-h">System Update</h3>
-                <button class="btn-next" onclick="startUpdate()" id="set-up-btn">Update PC</button>
-            </div>
+            <div id="update-tab" class="set-content active"><h3>Update</h3><button class="btn-next" onclick="startUpdate()" id="set-up-btn">Update</button></div>
             <div id="wifi-tab" class="set-content">
                 <h3 id="wifi-h">WiFi</h3>
-                <div style="border: 1px solid #ddd; padding: 10px; margin-bottom: 5px;">
-                    <strong id="wifi-p-name">Potato Wifi</strong> <span id="potato-stat" style="color:green;"></span>
-                    <button class="btn-next" onclick="connectWifi('potato')" style="float:right; width:auto; margin:0;" id="wifi-p-btn">Connect</button>
-                </div>
-                <div style="border: 1px solid #ddd; padding: 10px;">
-                    <strong id="wifi-g-name">Pro Gamer Wifi</strong> <span id="gamer-stat"></span>
-                    <button class="btn-next" onclick="connectWifi('gamer')" style="float:right; width:auto; margin:0;" id="wifi-g-btn">Connect</button>
-                </div>
+                <div style="border: 1px solid #ddd; padding: 10px; margin-bottom: 5px;"><strong id="wifi-p-name">Potato Wifi</strong> <button class="btn-next" onclick="connectWifi('potato')" style="float:right; width:auto; margin:0;">Connect</button></div>
+                <div style="border: 1px solid #ddd; padding: 10px;"><strong id="wifi-g-name">Pro Gamer Wifi</strong> <button class="btn-next" onclick="connectWifi('gamer')" style="float:right; width:auto; margin:0;">Connect</button></div>
             </div>
         </div>
 
         <div id="browser-win" class="window" style="left:120px; top:120px; width: 600px;">
             <div class="window-header"><span>QXBrowser</span><span onclick="closeWin('browser-win')" class="close-btn">×</span></div>
-            <div id="browser-res" style="flex:1; background:#eee; display:flex; align-items:center; justify-content:center; flex-direction:column; color:#000;">
-                <h2 id="b-net-name">Offline</h2>
-                <p id="b-net-desc">Turn on WiFi in terminal.</p>
-            </div>
-        </div>
-
-        <div id="start-menu">
-            <div class="start-item" id="start-set" onclick="openWin('settings-win'); toggleStart()">⚙ Ustawienia</div>
-            <div class="start-item" id="start-res" onclick="location.reload()">🔄 Restart</div>
+            <div id="browser-res" style="flex:1; background:#eee; display:flex; align-items:center; justify-content:center; flex-direction:column; color:#000;"><h2 id="b-net-name">Offline</h2></div>
         </div>
 
         <div class="taskbar">
@@ -169,41 +148,34 @@
             <div id="net-label" style="font-size:12px; color:red; margin-right:15px;">Offline</div>
             <div id="clock" style="margin-left:auto"></div>
         </div>
+        <div id="start-menu">
+            <div class="start-item" id="start-set" onclick="openWin('settings-win'); toggleStart()">⚙ Ustawienia</div>
+            <div class="start-item" onclick="location.reload()">🔄 Restart</div>
+        </div>
     </div>
 
     <script>
         let sysData = { user: "", pass: "", net: false, lang: "pl", currentWifi: "" };
 
-        // ANIMACJA INTRO
+        // NAPRAWIONE INTRO
         window.onload = () => {
-            const show = (id, time) => setTimeout(() => { document.getElementById(id).style.opacity = 1; }, time);
-            const hide = (id, time) => setTimeout(() => { document.getElementById(id).style.opacity = 0; }, time);
-
-            show('t1', 500); hide('t1', 2000);
-            show('t2', 2500); hide('t2', 4000);
-            show('t3', 4500); hide('t3', 6000);
-            setTimeout(() => { document.getElementById('intro-screen').style.display = 'none'; }, 7000);
+            const t1 = document.getElementById('t1'), t2 = document.getElementById('t2'), t3 = document.getElementById('t3');
+            setTimeout(() => t1.style.opacity = 1, 500);
+            setTimeout(() => t1.style.opacity = 0, 2000);
+            setTimeout(() => t2.style.opacity = 1, 2500);
+            setTimeout(() => t2.style.opacity = 0, 4000);
+            setTimeout(() => t3.style.opacity = 1, 4500);
+            setTimeout(() => t3.style.opacity = 0, 6000);
+            setTimeout(() => {
+                document.getElementById('intro-screen').style.display = 'none';
+                document.getElementById('config-screen').style.display = 'flex'; // To dodano!
+            }, 6500);
         };
 
         const langData = {
-            pl: {
-                load: "Wczytywanie...", greet: "Witaj, ", bootS: "Uruchom System", bootB: "Uruchom QXBios", 
-                note: "Notatnik", set: "Ustawienia", update: "Aktualizacja", connect: "Połącz", 
-                connected: "(Połączono)", netErr: "Błąd sieci", netOff: "Włącz WiFi w terminalu.",
-                passP: "Hasło (1234):", help: "notatnik.exe, wifi on/off, tplink on/off, reset pc, cls, help"
-            },
-            en: {
-                load: "Loading...", greet: "Welcome, ", bootS: "Start System", bootB: "Start QXBios", 
-                note: "Notepad", set: "Settings", update: "Update", connect: "Connect", 
-                connected: "(Connected)", netErr: "Network Error", netOff: "Turn on WiFi in terminal.",
-                passP: "Password (1234):", help: "notatnik.exe, wifi on/off, tplink on/off, reset pc, cls, help"
-            },
-            zh: {
-                load: "正在加载...", greet: "你好, ", bootS: "启动系统", bootB: "启动 QXBios", 
-                note: "记事本", set: "设置", update: "更新", connect: "连接", 
-                connected: "(已连接)", netErr: "网络错误", netOff: "在终端开启WiFi。",
-                passP: "密码 (1234):", help: "命令: notatnik.exe, wifi on/off, tplink on/off, reset pc, cls, help"
-            }
+            pl: { load: "Wczytywanie...", greet: "Witaj, ", bootS: "Uruchom System", note: "Notatnik", set: "Ustawienia", help: "wifi on/off, notatnik.exe, cls, help" },
+            en: { load: "Loading...", greet: "Welcome, ", bootS: "Start System", note: "Notepad", set: "Settings", help: "wifi on/off, notatnik.exe, cls, help" },
+            zh: { load: "正在加载...", greet: "你好, ", bootS: "启动系统", note: "记事本", set: "设置", help: "命令: wifi on/off, notatnik.exe, cls, help" }
         };
 
         function nextStep(s) {
@@ -229,14 +201,9 @@
             const l = langData[sysData.lang];
             document.getElementById('load-label').innerText = l.load;
             document.getElementById('boot-sys-btn').innerText = l.bootS;
-            document.getElementById('boot-bios-btn').innerText = l.bootB;
             document.getElementById('label-note').innerText = l.note;
-            document.getElementById('title-note').innerText = l.note;
             document.getElementById('title-settings').innerText = l.set;
-            document.getElementById('nav-update').innerText = l.update;
             document.getElementById('start-set').innerText = "⚙ " + l.set;
-            document.getElementById('wifi-p-btn').innerText = l.connect;
-            document.getElementById('wifi-g-btn').innerText = l.connect;
             if(sysData.lang === 'zh') {
                 document.getElementById('wifi-p-name').innerText = "土豆 WiFi";
                 document.getElementById('wifi-g-name').innerText = "专业玩家 WiFi";
@@ -272,27 +239,17 @@
         }
 
         function connectWifi(type) {
-            const l = langData[sysData.lang];
-            if(type === 'potato') {
-                sysData.currentWifi = (sysData.lang === 'zh' ? "土豆 WiFi" : "Potato Wifi");
-                updateWifiUI();
-            } else {
-                let p = prompt(l.passP);
-                if(p === "1234") {
-                    sysData.currentWifi = (sysData.lang === 'zh' ? "专业玩家 WiFi" : "Pro Gamer Wifi");
-                    updateWifiUI();
-                }
+            if(type === 'potato') { sysData.currentWifi = (sysData.lang === 'zh' ? "土豆 WiFi" : "Potato Wifi"); }
+            else { 
+                let p = prompt("Password (1234):"); 
+                if(p === "1234") sysData.currentWifi = (sysData.lang === 'zh' ? "专业玩家 WiFi" : "Pro Gamer Wifi"); 
             }
+            updateWifiUI();
         }
 
         function updateWifiUI() {
-            const l = langData[sysData.lang];
-            let isPotato = sysData.currentWifi.includes("Potato") || sysData.currentWifi.includes("土豆");
-            document.getElementById('potato-stat').innerText = isPotato ? l.connected : "";
-            document.getElementById('gamer-stat').innerText = !isPotato ? l.connected : "";
             if(sysData.net) {
-                document.getElementById('b-net-name').innerText = l.connected + ": " + sysData.currentWifi;
-                document.getElementById('b-net-desc').innerText = isPotato ? "15 kb/s" : "1 Gb/s";
+                document.getElementById('b-net-name').innerText = "Connected: " + sysData.currentWifi;
                 document.getElementById('net-label').innerText = "Online (" + sysData.currentWifi + ")";
                 document.getElementById('net-label').style.color = "lime";
             }
@@ -312,7 +269,6 @@
         function bootSystem() { document.getElementById('boot-screen').style.display = 'none'; document.getElementById('desktop').style.display = 'block'; }
         function openBios() { document.getElementById('boot-screen').style.display = 'none'; document.getElementById('bios-ui').style.display = 'block'; }
         
-        // CMD
         document.getElementById('cmd-in').onkeypress = function(e) {
             if(e.key === 'Enter') {
                 let v = this.value.toLowerCase().trim();
@@ -324,15 +280,13 @@
                 } else if(['wifi off', 'internet off', 'tplink off'].includes(v)) {
                     sysData.net = false; document.getElementById('wifi-nav').style.display = 'none';
                     document.getElementById('net-label').innerText = "Offline"; document.getElementById('net-label').style.color = "red";
-                    document.getElementById('b-net-name').innerText = langData[sysData.lang].netErr;
-                } else if(v === 'notatnik.exe') openWin('note-win');
-                else if(v === 'help') h.innerHTML += `<div>${langData[sysData.lang].help}</div>`;
+                } else if(v === 'help') h.innerHTML += `<div>${langData[sysData.lang].help}</div>`;
                 else if(v === 'cls') h.innerHTML = "";
+                else if(v === 'notatnik.exe') openWin('note-win');
                 this.value = ''; document.getElementById('term-content').scrollTop = 9999;
             }
         }
 
-        // DRAG
         let act = null, ox, oy;
         document.querySelectorAll('.window-header').forEach(h => {
             h.onmousedown = (e) => { act = h.parentElement; ox = e.clientX-act.offsetLeft; oy = e.clientY-act.offsetTop; act.style.zIndex = 500; };
