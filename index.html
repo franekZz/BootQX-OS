@@ -5,232 +5,213 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BootQX OS</title>
     <style>
-        /* PODSTAWOWE STYLE */
-        body { margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, sans-serif; overflow: hidden; background: #000; transition: 0.5s; }
+        :root { --p-color: #bf00ff; --p-soft: #6a00b3; }
+        body { margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; overflow: hidden; background: #0d001a; transition: 0.5s; }
         
-        #config-screen, #loading-screen, #login-screen { 
-            position: fixed; inset: 0; display: flex; flex-direction: column; 
-            align-items: center; justify-content: center; z-index: 100; 
-        }
+        /* CHMURKI W TLE */
+        .clouds-bg { position: fixed; width: 100%; height: 100%; background: linear-gradient(to bottom, #1a0033, #0d001a); z-index: -1; }
+        .cloud { position: absolute; background: rgba(191, 0, 255, 0.1); border-radius: 50%; filter: blur(40px); animation: move 20s infinite linear; }
+        @keyframes move { from { transform: translateX(-100px); } to { transform: translateX(100vw); } }
 
+        /* KREATOR KONFIGURACJI */
+        #config-screen { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; z-index: 1000; }
+        .config-step { background: rgba(26, 0, 51, 0.9); border: 2px solid var(--p-color); padding: 40px; border-radius: 20px; text-align: center; color: #fff; width: 350px; display: none; box-shadow: 0 0 20px rgba(191,0,255,0.3); }
+        .config-step.active { display: block; animation: fadeIn 0.5s; }
+
+        input, select { margin: 20px 0; padding: 12px; width: 100%; border-radius: 8px; border: 1px solid var(--p-color); background: #000; color: #fff; box-sizing: border-box; }
+        
+        /* ANIMOWANY PRZYCISK */
+        .btn-next { 
+            cursor: pointer; background: var(--p-color); color: white; border: none; 
+            padding: 12px 25px; font-weight: bold; border-radius: 8px; width: 100%; 
+            transition: 0.3s ease; 
+        }
+        .btn-next:hover { transform: scale(1.05) translateY(-3px); box-shadow: 0 5px 15px rgba(191,0,255,0.5); background: #d433ff; }
+
+        /* RESZTA INTERFEJSU (LOGOWANIE, PULPIT) */
+        #loading-screen, #login-screen { position: fixed; inset: 0; display: none; flex-direction: column; align-items: center; justify-content: center; background: #0d001a; color: #fff; z-index: 2000; }
+        #desktop { display: none; width: 100vw; height: 100vh; position: relative; }
+        
         /* MOTYWY */
-        .theme-dark-purple { background: #0d001a; color: #bf00ff; }
-        .theme-dark-purple .box { background: #1a0033; border: 2px solid #bf00ff; padding: 30px; border-radius: 12px; text-align: center; }
+        .theme-dark-purple { background: #0d001a; }
+        .theme-light-purple { background: #f5e6ff; }
+        .theme-light-purple .taskbar { background: #6a00b3; }
+
+        .window { width: 500px; height: 350px; background: #fff; color: #000; border-radius: 8px; position: absolute; display: none; flex-direction: column; box-shadow: 0 10px 40px rgba(0,0,0,0.5); border: 1px solid #333; z-index: 100; }
+        .window-header { background: #222; color: #fff; padding: 10px; cursor: move; display: flex; justify-content: space-between; }
         
-        .theme-light-purple { background: #f5e6ff; color: #6a00b3; }
-        .theme-light-purple .box { background: #fff; border: 2px solid #6a00b3; padding: 30px; border-radius: 12px; text-align: center; color: #000; box-shadow: 0 5px 20px rgba(0,0,0,0.2); }
+        .taskbar { position: absolute; bottom: 0; width: 100%; height: 45px; background: #111; display: flex; align-items: center; padding: 0 15px; box-sizing: border-box; color: white; }
+        .start-btn { font-weight: bold; color: var(--p-color); cursor: pointer; font-size: 20px; }
 
-        input, select, button { margin: 10px 0; padding: 10px; width: 250px; border-radius: 5px; border: 1px solid #ccc; display: block; }
-        button { cursor: pointer; background: #6a00b3; color: white; border: none; font-weight: bold; width: 272px; transition: 0.3s; }
-        button:hover { opacity: 0.8; }
+        .desktop-icon { position: absolute; top: 30px; left: 30px; cursor: pointer; text-align: center; color: white; font-size: 13px; }
+        .desktop-icon div { width: 50px; height: 50px; background: #333; border: 2px solid var(--p-color); border-radius: 10px; margin-bottom: 5px; display: flex; align-items: center; justify-content: center; font-weight: bold; }
 
-        /* ŁADOWANIE */
-        .progress-bar { width: 300px; height: 10px; background: #333; border-radius: 5px; overflow: hidden; margin-top: 20px; }
-        #progress { width: 0%; height: 100%; background: #bf00ff; transition: 0.1s; }
-
-        /* PULPIT */
-        #desktop { display: none; width: 100vw; height: 100vh; position: relative; background-size: cover; }
-        .theme-dark-purple #desktop { background: #0d001a; }
-        .theme-light-purple #desktop { background: #f0f0f0; }
-
-        .taskbar { 
-            position: absolute; bottom: 0; width: 100%; height: 45px; 
-            background: #111; color: #fff; display: flex; 
-            align-items: center; justify-content: space-between; 
-            padding: 0 15px; box-sizing: border-box; z-index: 1000;
-        }
-
-        .start-btn { font-weight: bold; color: #bf00ff; cursor: pointer; }
-        .cmd-icon { background: #333; padding: 5px 15px; border-radius: 4px; cursor: pointer; font-size: 12px; border: 1px solid #555; margin-left: 15px; }
-
-        /* OKNA */
-        .window { 
-            width: 500px; height: 350px; background: #fff; color: #000; 
-            border-radius: 8px; position: absolute; top: 100px; left: 100px; 
-            overflow: hidden; display: flex; flex-direction: column; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 10;
-        }
-        .window-header { background: #333; color: #fff; padding: 10px; font-weight: bold; display: flex; justify-content: space-between; cursor: default; }
-        .close-btn { cursor: pointer; color: #ff4444; }
-
-        /* TERMINAL SPECIFIC */
-        #terminal-body { background: #000; color: #0f0; font-family: 'Courier New', monospace; padding: 10px; flex: 1; overflow-y: auto; font-size: 14px; }
-        #cmd-input { background: transparent; border: none; color: #0f0; outline: none; width: 100%; font-family: inherit; padding: 0; margin: 0; display: inline; }
-        .prompt-line { display: flex; gap: 5px; }
-
-        textarea { flex: 1; border: none; padding: 15px; outline: none; resize: none; font-size: 16px; font-family: inherit; }
-        
-        pre { font-size: 8px; line-height: 1; color: inherit; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body class="theme-dark-purple">
 
+    <div class="clouds-bg" id="clouds"></div>
+
     <div id="config-screen">
-        <div class="box">
-            <h1>Konfiguracja BootQX OS</h1>
-            <input type="text" id="uname" placeholder="Twoja nazwa użytkownika...">
-            <input type="password" id="upass" placeholder="Hasło (opcjonalnie)">
+        <div id="step1" class="config-step active">
+            <h2>Witaj w BootQX</h2>
+            <p>Jak masz na imię?</p>
+            <input type="text" id="uname" placeholder="Imię użytkownika...">
+            <button class="btn-next" onclick="nextStep(2)">Dalej</button>
+        </div>
+
+        <div id="step2" class="config-step">
+            <h2>Zabezpieczenia</h2>
+            <p>Ustaw hasło (zostaw puste, jeśli nie chcesz):</p>
+            <input type="password" id="upass" placeholder="Hasło...">
+            <button class="btn-next" onclick="nextStep(3)">Dalej</button>
+        </div>
+
+        <div id="step3" class="config-step">
+            <h2>Wygląd</h2>
+            <p>Wybierz swój styl:</p>
             <select id="utheme">
                 <option value="dark-purple">Czarno-Fioletowy</option>
                 <option value="light-purple">Biało-Fioletowy</option>
             </select>
-            <button onclick="startSetup()">Instaluj System</button>
+            <button class="btn-next" onclick="finishSetup()">Uruchom System</button>
         </div>
     </div>
 
-    <div id="loading-screen" style="display:none">
-        <h1>Instalowanie BootQX OS...</h1>
-        <div class="progress-bar"><div id="progress"></div></div>
-        <p id="status">Kopiowanie plików jądra...</p>
+    <div id="loading-screen">
+        <h1 id="loading-txt">BootQX OS</h1>
+        <div style="width: 200px; height: 5px; background: #333; margin-top: 10px;">
+            <div id="load-bar" style="width: 0%; height: 100%; background: var(--p-color);"></div>
+        </div>
     </div>
 
-    <div id="login-screen" style="display:none">
-        <div class="box">
-            <pre>
-  ____              _    _______  __  ____  ____ 
- | __ )  ___   ___ | |_ / _ \ \ \/ / / ___|/ ___|
- |  _ \ / _ \ / _ \| __| | | \ \  /  \___ \\___ \
- | |_) | (_) | (_) | |_| |_| / /  \   ___) |___) |
- |____/ \___/ \___/ \__|\__\_\/_/\_\ |____/|____/ 
-            </pre>
-            <h2 id="greet">Witaj</h2>
-            <div id="login-fields">
-                <input type="password" id="pass-check" placeholder="Wpisz hasło">
-                <button onclick="accessSystem()">Zaloguj</button>
-            </div>
-            <button id="guest-btn" style="display:none" onclick="accessSystem()">Zaloguj bez hasła</button>
-            <p id="error-msg" style="color:red; font-size: 12px;"></p>
+    <div id="login-screen">
+        <h2 id="login-greet">Zaloguj się</h2>
+        <div id="pass-area">
+            <input type="password" id="pass-in" placeholder="Hasło" style="width: 250px;">
+            <button class="btn-next" onclick="tryLogin()">Zaloguj</button>
         </div>
     </div>
 
     <div id="desktop">
-        <div id="terminal-window" class="window" style="display: none;">
-            <div class="window-header">
-                <span>BootQX Command Prompt (CMD)</span>
-                <span class="close-btn" onclick="toggleWin('terminal-window')">✕</span>
-            </div>
-            <div id="terminal-body" onclick="focusCMD()">
-                <div id="history">BootQX OS [Wersja 1.0.26]<br>(c) Dejw_Devo1 Corporation. Wszystkie prawa zastrzeżone.<br><br>Wpisz 'help', aby zobaczyć listę komend.</div>
-                <div class="prompt-line">
-                    <span id="prompt-text">C:\Users\User></span>
-                    <input type="text" id="cmd-input" spellcheck="false" autocomplete="off">
-                </div>
+        <div class="desktop-icon" onclick="toggleWin('cmd-win')">
+            <div>>_</div>
+            CMD.exe
+        </div>
+
+        <div id="cmd-win" class="window" style="left:100px; top:50px;">
+            <div class="window-header"><span>Terminal</span><span onclick="toggleWin('cmd-win')" style="cursor:pointer">✕</span></div>
+            <div id="term-body" style="background:#000; color:#0f0; flex:1; padding:10px; font-family:monospace; overflow-y:auto;">
+                <div>BootQX Terminal. Wpisz 'notatnik.exe'</div>
+                <span id="prompt">C:\></span><input type="text" id="cmd-in" style="background:transparent; border:none; color:#0f0; outline:none; width:70%;">
             </div>
         </div>
 
-        <div id="notepad-window" class="window" style="display: none;">
-            <div class="window-header">
-                <span id="win-title">Notatnik</span>
-                <span class="close-btn" onclick="toggleWin('notepad-window')">✕</span>
-            </div>
-            <textarea id="notepad-content" placeholder="Zacznij pisać tutaj..."></textarea>
+        <div id="note-win" class="window" style="left:150px; top:100px;">
+            <div class="window-header"><span>Notatnik</span><span onclick="toggleWin('note-win')" style="cursor:pointer">✕</span></div>
+            <textarea style="flex:1; border:none; padding:10px; resize:none; outline:none;"></textarea>
         </div>
 
         <div class="taskbar">
-            <div style="display: flex; align-items: center;">
-                <span class="start-btn">QX</span>
-                <div class="cmd-icon" onclick="toggleWin('terminal-window')">CMD</div>
-            </div>
-            <div id="bar-info"></div>
-            <div id="clock">00:00:00</div>
+            <div class="start-btn">QX</div>
+            <div id="clock" style="margin-left: auto;"></div>
         </div>
     </div>
 
     <script>
-        let config = { name: "", pass: "", theme: "" };
+        // Tworzenie chmurek
+        const clouds = document.getElementById('clouds');
+        for(let i=0; i<8; i++) {
+            let c = document.createElement('div');
+            c.className = 'cloud';
+            c.style.width = Math.random() * 200 + 100 + 'px';
+            c.style.height = c.style.width;
+            c.style.top = Math.random() * 100 + 'vh';
+            c.style.left = Math.random() * 100 + 'vw';
+            c.style.animationDelay = Math.random() * 20 + 's';
+            clouds.appendChild(c);
+        }
 
-        function startSetup() {
-            config.name = document.getElementById('uname').value || "Użytkownik";
-            config.pass = document.getElementById('upass').value;
-            config.theme = document.getElementById('utheme').value;
+        let sysData = { name: "", pass: "", theme: "" };
+
+        function nextStep(s) {
+            document.querySelectorAll('.config-step').forEach(e => e.classList.remove('active'));
+            document.getElementById('step' + s).classList.add('active');
+        }
+
+        function finishSetup() {
+            sysData.name = document.getElementById('uname').value || "Użytkownik";
+            sysData.pass = document.getElementById('upass').value;
+            sysData.theme = document.getElementById('utheme').value;
+            document.body.className = "theme-" + sysData.theme;
             
-            document.body.className = "theme-" + config.theme;
             document.getElementById('config-screen').style.display = 'none';
             document.getElementById('loading-screen').style.display = 'flex';
             
             let p = 0;
-            let bar = document.getElementById('progress');
-            let stat = document.getElementById('status');
-            
             let itv = setInterval(() => {
-                p++;
-                bar.style.width = p + "%";
-                if(p == 30) stat.innerText = "Konfigurowanie profilu: " + config.name + "...";
-                if(p == 60) stat.innerText = "Ustawianie motywu " + config.theme + "...";
-                if(p == 90) stat.innerText = "Uruchamianie usług systemowych...";
+                p += 5;
+                document.getElementById('load-bar').style.width = p + "%";
                 if(p >= 100) {
                     clearInterval(itv);
-                    setTimeout(showLogin, 500);
+                    showLogin();
                 }
-            }, 30);
+            }, 100);
         }
 
         function showLogin() {
             document.getElementById('loading-screen').style.display = 'none';
             document.getElementById('login-screen').style.display = 'flex';
-            document.getElementById('greet').innerText = "Zaloguj: " + config.name;
-            if(!config.pass) {
-                document.getElementById('login-fields').style.display = 'none';
-                document.getElementById('guest-btn').style.display = 'block';
-            }
+            document.getElementById('login-greet').innerText = "Witaj, " + sysData.name;
+            if(!sysData.pass) document.getElementById('pass-in').style.display = 'none';
         }
 
-        function accessSystem() {
-            let p = document.getElementById('pass-check').value;
-            if(!config.pass || p === config.pass) {
+        function tryLogin() {
+            let p = document.getElementById('pass-in').value;
+            if(p === sysData.pass) {
                 document.getElementById('login-screen').style.display = 'none';
                 document.getElementById('desktop').style.display = 'block';
-                document.getElementById('bar-info').innerText = "Zalogowano: " + config.name;
-                document.getElementById('prompt-text').innerText = "C:\\Users\\" + config.name + ">";
-                document.getElementById('win-title').innerText = "Notatnik - " + config.name;
-                
-                setInterval(() => {
-                    document.getElementById('clock').innerText = new Date().toLocaleTimeString();
-                }, 1000);
-            } else {
-                document.getElementById('error-msg').innerText = "Błędne hasło! Spróbuj ponownie.";
-            }
+                document.getElementById('prompt').innerText = "C:\\Users\\" + sysData.name + ">";
+                startClock();
+            } else alert("Błąd!");
         }
 
         function toggleWin(id) {
-            let win = document.getElementById(id);
-            win.style.display = (win.style.display === 'none') ? 'flex' : 'none';
-            if(id === 'terminal-window' && win.style.display === 'flex') {
-                setTimeout(focusCMD, 50);
-            }
+            let w = document.getElementById(id);
+            w.style.display = w.style.display === 'flex' ? 'none' : 'flex';
         }
 
-        function focusCMD() {
-            document.getElementById('cmd-input').focus();
+        function startClock() {
+            setInterval(() => {
+                document.getElementById('clock').innerText = new Date().toLocaleTimeString();
+            }, 1000);
         }
 
-        // OBSŁUGA CMD
-        document.getElementById('cmd-input').addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') {
-                let cmd = this.value.toLowerCase().trim();
-                let hist = document.getElementById('history');
-                
-                hist.innerHTML += `<div>C:\\Users\\${config.name}> ${this.value}</div>`;
-
-                if (cmd === 'notatnik.exe') {
-                    document.getElementById('notepad-window').style.display = 'flex';
-                    hist.innerHTML += `<div style="color: yellow">Proces 'notatnik.exe' uruchomiony pomyślnie.</div>`;
-                } else if (cmd === 'help') {
-                    hist.innerHTML += `<div>Dostępne komendy: <b>notatnik.exe</b>, <b>cls</b>, <b>help</b>, <b>exit</b>, <b>whoami</b></div>`;
-                } else if (cmd === 'cls') {
-                    hist.innerHTML = "BootQX OS [Wersja 1.0.26]";
-                } else if (cmd === 'whoami') {
-                    hist.innerHTML += `<div>Aktualny użytkownik: ${config.name}</div>`;
-                } else if (cmd === 'exit') {
-                    toggleWin('terminal-window');
-                } else if (cmd !== "") {
-                    hist.innerHTML += `<div style="color: #ff4444">'${cmd}' nie jest rozpoznawana jako komenda systemowa.</div>`;
-                }
-
-                this.value = '';
-                document.getElementById('terminal-body').scrollTop = document.getElementById('terminal-body').scrollHeight;
+        // CMD LOGIC
+        document.getElementById('cmd-in').addEventListener('keypress', (e) => {
+            if(e.key === 'Enter') {
+                if(e.target.value.toLowerCase() === 'notatnik.exe') toggleWin('note-win');
+                e.target.value = '';
             }
         });
+
+        // DRAG LOGIC
+        let active = null, ox, oy;
+        document.querySelectorAll('.window-header').forEach(h => {
+            h.onmousedown = (e) => {
+                active = h.parentElement;
+                ox = e.clientX - active.offsetLeft;
+                oy = e.clientY - active.offsetTop;
+            };
+        });
+        document.onmousemove = (e) => {
+            if(active) {
+                active.style.left = e.clientX - ox + 'px';
+                active.style.top = e.clientY - oy + 'px';
+            }
+        };
+        document.onmouseup = () => active = null;
     </script>
 </body>
 </html>
