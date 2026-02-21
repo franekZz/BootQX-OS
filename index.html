@@ -2,12 +2,38 @@
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <title>BootQX OS v1.0</title>
+    <title>BootQX OS - Konfiguracja</title>
     <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body class="theme-dark-purple"> <div id="config-screen">
+        <div class="config-box">
+            <h1>Konfiguracja BootQX OS</h1>
+            
+            <label>Nazwa użytkownika:</label>
+            <input type="text" id="username-input" placeholder="Wpisz imię...">
 
-    <div id="login-screen">
+            <label>Hasło (zostaw puste, jeśli brak):</label>
+            <input type="password" id="password-input" placeholder="Hasło...">
+
+            <label>Wybierz motyw:</label>
+            <select id="theme-select">
+                <option value="dark-purple">Czarno-fioletowy</option>
+                <option value="light-purple">Biało-fioletowy</option>
+            </select>
+
+            <button onclick="startInstallation()">Zastosuj i uruchom</button>
+        </div>
+    </div>
+
+    <div id="loading-screen" style="display: none;">
+        <div class="loader-content">
+            <h1 id="loading-title">BootQX OS</h1>
+            <div class="progress-bar"><div id="progress"></div></div>
+            <p id="loading-status">Przygotowywanie profilu...</p>
+        </div>
+    </div>
+
+    <div id="login-screen" style="display: none;">
         <div class="logo">
             <pre>
   ____              _    _______  __  ____  ____ 
@@ -16,12 +42,14 @@
  | |_) | (_) | (_) | |_| |_| / /  \   ___) |___) |
  |____/ \___/ \___/ \__|\__\_\/_/\_\ |____/|____/ 
             </pre>
-            <p>System stworzony przez Dejw_Devo1</p>
         </div>
-
         <div class="login-box">
-            <input type="password" id="password" placeholder="Wpisz hasło...">
-            <button onclick="login()">Zaloguj</button>
+            <h2 id="welcome-user">Witaj!</h2>
+            <div id="pass-field">
+                <input type="password" id="login-password" placeholder="Hasło">
+                <button onclick="login()">Zaloguj</button>
+            </div>
+            <button id="auto-login-btn" style="display:none;" onclick="login()">Kliknij, aby wejść</button>
             <p id="error-msg"></p>
         </div>
     </div>
@@ -29,10 +57,11 @@
     <div id="desktop" style="display: none;">
         <div class="taskbar">
             <div class="start-btn">QX</div>
+            <div id="user-display" style="margin-left: 10px;"></div>
             <div class="clock" id="clock"></div>
         </div>
         <div class="window">
-            <div class="window-header">Notatnik - Codel (Kodi)</div>
+            <div class="window-header" id="win-header">Notatnik</div>
             <textarea placeholder="Zacznij pisać..."></textarea>
         </div>
     </div>
