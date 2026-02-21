@@ -1,80 +1,26 @@
-body {
-    background-color: #1a1a1a;
-    color: #00ff00;
-    font-family: 'Courier New', Courier, monospace;
-    margin: 0;
-    overflow: hidden;
+/* Motyw Czarno-Fioletowy */
+.theme-dark-purple { background-color: #0d001a; color: #bf00ff; }
+.theme-dark-purple .config-box, .theme-dark-purple .login-box { background: #1a0033; border: 2px solid #bf00ff; padding: 20px; }
+.theme-dark-purple input, .theme-dark-purple select { background: #000; color: #bf00ff; border: 1px solid #bf00ff; margin: 10px 0; padding: 5px; }
+.theme-dark-purple button { background: #bf00ff; color: #fff; border: none; padding: 10px; cursor: pointer; }
+
+/* Motyw Biało-Fioletowy */
+.theme-light-purple { background-color: #f5e6ff; color: #6a00b3; }
+.theme-light-purple .config-box, .theme-light-purple .login-box { background: #fff; border: 2px solid #6a00b3; padding: 20px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+.theme-light-purple input, .theme-light-purple select { background: #fff; color: #6a00b3; border: 1px solid #6a00b3; margin: 10px 0; padding: 5px; }
+.theme-light-purple button { background: #6a00b3; color: #fff; border: none; padding: 10px; cursor: pointer; }
+
+/* Reszta layoutu */
+body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; overflow: hidden; transition: 0.5s; }
+#config-screen, #loading-screen, #login-screen { 
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+    display: flex; justify-content: center; align-items: center; flex-direction: column;
 }
 
-#login-screen {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100vh;
-}
+.progress-bar { width: 300px; height: 10px; background: #333; border-radius: 5px; margin-top: 20px; overflow: hidden; }
+#progress { width: 0%; height: 100%; background: currentColor; transition: 0.1s; }
 
-.logo pre {
-    font-size: 12px;
-    line-height: 1.2;
-}
-
-.login-box {
-    margin-top: 20px;
-}
-
-input {
-    background: #333;
-    border: 1px solid #00ff00;
-    color: #00ff00;
-    padding: 10px;
-}
-
-button {
-    background: #00ff00;
-    color: #000;
-    border: none;
-    padding: 10px 20px;
-    cursor: pointer;
-    font-weight: bold;
-}
-
-#desktop {
-    background: #004080; /* Klasyczny niebieski kolor pulpitu */
-    height: 100vh;
-    width: 100vw;
-}
-
-.taskbar {
-    position: absolute;
-    bottom: 0;
-    width: 100%;
-    height: 40px;
-    background: #333;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-.window {
-    width: 400px;
-    height: 300px;
-    background: #fff;
-    border: 2px solid #000;
-    position: absolute;
-    top: 50px;
-    left: 50px;
-}
-
-.window-header {
-    background: #000080;
-    color: white;
-    padding: 5px;
-}
-
-textarea {
-    width: 100%;
-    height: 270px;
-    border: none;
-    resize: none;
-}
+.taskbar { position: absolute; bottom: 0; width: 100%; height: 40px; background: #222; color: white; display: flex; align-items: center; z-index: 10; }
+.window { width: 500px; height: 350px; background: white; color: black; border: 1px solid #666; position: absolute; top: 50px; left: 50px; box-shadow: 5px 5px 15px rgba(0,0,0,0.3); }
+.window-header { background: #6a00b3; color: white; padding: 8px; font-weight: bold; }
+textarea { width: 100%; height: calc(100% - 40px); border: none; padding: 10px; box-sizing: border-box; }
