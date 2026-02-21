@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BootQX OS</title>
+    <style>
+        body { margin: 0; padding: 0; font-family: sans-serif; overflow: hidden; transition: 0.5s; background: #000; color: #fff; }
+        #config-screen, #loading-screen, #login-screen { position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10; }
+        
+        /* MOTYWY */
+        .theme-dark-purple { background: #0d001a; color: #bf00ff; }
+        .theme-dark-purple .box { background: #1a0033; border: 2px solid #bf00ff; padding: 30px; border-radius: 12px; text-align: center; }
+        
+        .theme-light-purple { background: #f5e6ff; color: #6a00b3; }
+        .theme-light-purple .box { background: #fff; border: 2px solid #6a00b3; padding: 30px; border-radius: 12px; text-align: center; color: #000; box-shadow: 0 5px 20px rgba(0,0,0,0.1); }
+
+        input, select, button { margin: 10px 0; padding: 10px; width: 250px; border-radius: 5px; border: 1px solid #ccc; display: block; }
+        button { cursor: pointer; background: #6a00b3; color: white; border: none; font-weight: bold; width: 272px; }
+
+        /* ŁADOWANIE */
+        .progress-bar { width: 300px; height: 10px; background: #333; border-radius: 5px; overflow: hidden; margin-top: 20px; }
+        #progress { width: 0%; height: 100%; background: #bf00ff; transition: 0.1s; }
+
+        /* PULPIT */
+        #desktop { display: none; width: 100vw; height: 100vh; position: relative; }
+        .taskbar { position: absolute; bottom: 0; width: 100%; height: 40px; background: #111; color: #fff; display: flex; align-items: center; justify-content: space-between; padding: 0 10px; box-sizing: border-box; }
+        .window { width: 450px; height: 300px; background: #fff; color: #000; border-radius: 8px; position: absolute; top: 50px; left: 50px; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .window-header { background: #6a00b3; color: #fff; padding: 8px; font-weight: bold; }
+        textarea { flex: 1; border: none; padding: 10px; outline: none; resize: none; }
+        pre { font-size: 8px; margin-bottom: 20px; color: inherit; }
+    </style>
+</head>
+<body class="theme-dark-purple">
+
+    <div id="config-screen">
+        <div class="box">
+            <h1>BootQX OS Setup</h1>
+            <input type="text" id="uname" placeholder="Twoja nazwa...">
+            <input type="password" id="upass" placeholder="Hasło (opcjonalnie)">
+            <select id="utheme">
+                <option value="dark-purple">Czarno-Fioletowy</option>
+                <option value="light-purple">Biało-Fioletowy</option>
+            </select>
+            <button onclick="start()">Uruchom Instalację</button>
+        </div>
+    </div>
+
+    <div id="loading-screen" style="display:none">
+        <h1>Instalowanie BootQX OS...</h1>
+        <div class="progress-bar"><div id="progress"></div></div>
+        <p id="status">Kopiowanie plików...</p>
+    </div>
+
+    <div id="login-screen" style="display:none">
+        <div class="box">
+            <pre>
+  ____              _    _______  __  ____  ____ 
+ | __ )  ___   ___ | |_ / _ \ \ \/ / / ___|/ ___|
+ |  _ \ / _ \ / _ \| __| | | \ \  /  \___ \\___ \
+ | |_) | (_) | (_) | |_| |_| / /  \   ___) |___) |
+ |____/ \___/ \___/ \__|\__\_\/_/\_\ |____/|____/ 
+            </pre>
+            <h2 id="greet">Witaj</h2>
+            <div id="login-fields">
+                <input type="password" id="pass-check" placeholder="Hasło">
+                <button onclick="access()">Zaloguj</button>
+            </div>
+            <button id="guest-btn" style="display:none" onclick="access()">Zaloguj jako Gość</button>
+        </div>
+    </div>
+
+    <div id="desktop">
+        <div class="window">
+            <div class="window-header" id="win-title">Notatnik</div>
+            <textarea placeholder="Pisz tutaj..."></textarea>
+        </div>
+        <div class="taskbar">
+            <span><b>QX</b> START</span>
+            <span id="bar-user"></span>
+            <span id="clock">00:00:00</span>
+        </div>
+    </div>
+
+    <script>
+        let config = { name: "", pass: "", theme: "" };
+
+        function start() {
+            config.name = document.getElementById('uname').value || "Użytkownik";
+            config.pass = document.getElementById('upass').value;
+            config.theme = document.getElementById('utheme').value;
+            
+            document.body.className = "theme-" + config.theme;
+            document.getElementById('config-screen').style.display = 'none';
+            document.getElementById('loading-screen').style.display = 'flex';
+            
+            let p = 0;
+            let bar = document.getElementById('progress');
+            let stat = document.getElementById('status');
+            
+            let itv = setInterval(() => {
+                p++;
+                bar.style.width = p + "%";
+                if(p == 40) stat.innerText = "Ustawianie motywu...";
+                if(p == 80) stat.innerText = "Finalizacja...";
+                if(p >= 100) {
+                    clearInterval(itv);
+                    showLogin();
+                }
+            }, 30);
+        }
+
+        function showLogin() {
+            document.getElementById('loading-screen').style.display = 'none';
+            document.getElementById('login-screen').style.display = 'flex';
+            document.getElementById('greet').innerText = "Zaloguj: " + config.name;
+            if(!config.pass) {
+                document.getElementById('login-fields').style.display = 'none';
+                document.getElementById('guest-btn').style.display = 'block';
+            }
+        }
+
+        function access() {
+            let p = document.getElementById('pass-check').value;
+            if(!config.pass || p === config.pass) {
+                document.getElementById('login-screen').style.display = 'none';
+                document.getElementById('desktop').style.display = 'block';
+                document.getElementById('bar-user').innerText = "User: " + config.name;
+                document.getElementById('win-title').innerText = "Notatnik - " + config.name;
+                setInterval(() => {
+                    document.getElementById('clock').innerText = new Date().toLocaleTimeString();
+                }, 1000);
+            } else {
+                alert("Błędne hasło!");
+            }
+        }
+    </script>
+</body>
+</html>
